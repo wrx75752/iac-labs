@@ -1,0 +1,133 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./example-app
+    concurrency:
+      group: build
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Poetry Action
+      uses: snok/install-poetry@v1.3.4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+
+    - name: Cache build venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          .venv
+          ~/.local
+        key: ${{ runner.os }}-venv-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      # if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        poetry install --no-root --no-interaction
+
+  check:
+    needs: [build]
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./example-app
+    concurrency:
+      group: check
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Poetry Action
+      uses: snok/install-poetry@v1.3.4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+
+    - name: Cache build venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          .venv
+          ~/.local
+        key: ${{ runner.os }}-venv-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      # if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        poetry install --no-root --no-interaction
+  
+    - name: Lint 
+      run: poetry run task lint
+
+    - name: Formatter 
+      run: poetry run task formatter
+
+    - name: Security 
+      run: poetry run task security
+
+  test:
+    needs: [check]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./example-app
+    concurrency:
+      group: test
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Poetry Action
+      uses: snok/install-poetry@v1.3.4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+
+    - name: Cache build venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          .venv
+          ~/.local
+        key: ${{ runner.os }}-venv-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      # if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        poetry install --no-root --no-interaction
+
+    - name: Test 
+      run: poetry run task test
