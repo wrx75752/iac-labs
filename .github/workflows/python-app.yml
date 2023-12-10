@@ -22,13 +22,6 @@ jobs:
       group: build
 
     steps:
-    - name: Cache build venv
-      id: cached-poetry-dependencies
-      uses: actions/cache@v3
-      with:
-        path: /home/runner/work/iac-labs/example-app/.venv
-        key: ${{ runner.os }}-venv
-
     - uses: actions/checkout@v3
 
     - name: Install Poetry Action
@@ -44,6 +37,13 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         poetry install --no-root --no-interaction
+
+    - name: Cache build venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: /home/runner/work/iac-labs/example-app/.venv
+        key: ${{ runner.os }}-venv
 
   check:
     needs: [build]
@@ -107,6 +107,6 @@ jobs:
       with:
         path: /home/runner/work/iac-labs/example-app/.venv
         key: ${{ runner.os }}-venv
-        
+
     - name: Test 
       run: poetry run task test
