@@ -14,12 +14,12 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./example-app
-
+    concurrency:
+      group: build
     steps:
     - name: Install Poetry Action
       uses: snok/install-poetry@v1.3.4
@@ -28,24 +28,33 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
-    - name: Check poetry
-      run: poetry debug info
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
     - name: Install dependencies
       run: poetry install --no-root --no-interaction
 
-    - name: lint 
+  check:
+    needs: [build]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./example-app
+    concurrency:
+      group: check
+    steps:
+    - name: Lint 
       run: poetry run task lint
-
-    - name: formatter 
+    - name: Formatter 
       run: poetry run task formatter
-
-    - name: security 
+    - name: Security 
       run: poetry run task security
 
-    - name: test 
+  test:
+    needs: [check]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./example-app
+    concurrency:
+      group: test
+    steps:
+    - name: Test 
       run: poetry run task test
