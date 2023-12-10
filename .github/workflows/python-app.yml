@@ -36,7 +36,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Install dependencies
-      run: poetry --no-dev -install -no-root --no-interaction
+      run: poetry install --no-root --no-interaction
 
     - name: lint 
       run: poetry run task lint
