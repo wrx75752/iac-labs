@@ -39,7 +39,7 @@ jobs:
         path: |
           .venv
           ~/.local
-        key: ${{ runner.os }}-venv
+        key: ${{ runner.os }}-venv-${{ hashFiles('**/poetry.lock') }}
 
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
@@ -76,7 +76,7 @@ jobs:
         path: |
           .venv
           ~/.local
-        key: ${{ runner.os }}-venv
+        key: ${{ runner.os }}-venv-${{ hashFiles('**/poetry.lock') }}
 
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
@@ -120,7 +120,7 @@ jobs:
         path: |
           .venv
           ~/.local
-        key: ${{ runner.os }}-venv
+        key: ${{ runner.os }}-venv-${{ hashFiles('**/poetry.lock') }}
 
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
