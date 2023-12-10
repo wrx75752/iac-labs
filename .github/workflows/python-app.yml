@@ -20,7 +20,7 @@ jobs:
         working-directory: ./example-app
     concurrency:
       group: build
-      
+
     steps:
     - name: Cache build venv
       id: cached-poetry-dependencies
@@ -66,6 +66,13 @@ jobs:
       with:
         python-version: "3.10"
 
+    - name: Cache build venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: /home/runner/work/iac-labs/example-app/.venv
+        key: ${{ runner.os }}-venv
+
     - name: Lint 
       run: poetry run task lint
 
@@ -94,5 +101,12 @@ jobs:
       with:
         python-version: "3.10"
 
+    - name: Cache build venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: /home/runner/work/iac-labs/example-app/.venv
+        key: ${{ runner.os }}-venv
+        
     - name: Test 
       run: poetry run task test
